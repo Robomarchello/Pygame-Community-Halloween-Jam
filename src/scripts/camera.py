@@ -3,7 +3,7 @@ from pygame.locals import *
 
 
 class Camera:
-    def __init__(self, screen, surface):
+    def __init__(self, screen, surface, doorSheet):
         self.screen = screen
         self.ScreenSize = screen.get_size()
         
@@ -18,9 +18,18 @@ class Camera:
 
         self.moveDir = {'left': False, 'right': False}
 
-    def draw(self, screen, mp):
+        self.doorSheet = doorSheet
+
+    def draw(self, screen, mp, ClosedDoor):
         self.update(mp)
         screen.blit(self.surface, (-(self.centerX + self.xOffset), 0))
+
+        if ClosedDoor['left']:
+            screen.blit(self.doorSheet[0], (-self.xOffset - 300, 0))
+        if ClosedDoor['center']:
+            screen.blit(self.doorSheet[1], (220 - self.xOffset, 0))
+        if ClosedDoor['right']:
+            screen.blit(self.doorSheet[2], (740 - self.xOffset, 0))
 
     def update(self, mp):
         if mp.x < 300 and self.xOffset > -self.maxOffset:

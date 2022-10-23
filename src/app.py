@@ -16,9 +16,9 @@ class App():
         self.cursor = Cursor()
 
         wide = pygame.image.load('src/assets/wide1.png').convert()
-        self.game = Game(self.screen, wide)
+        self.game = Game(self.screen, wide, self.cursor)
 
-        self.event_handlers = [self.cursor]
+        self.event_handlers = [self.cursor, self.game]
 
         self.clock = pygame.time.Clock()
         self.fps = fps
@@ -28,6 +28,8 @@ class App():
         while True:
             self.clock.tick(self.fps)
             screen.fill((255, 255, 255))
+            
+            self.cursor.update()
             
             mp = self.cursor.mp
 

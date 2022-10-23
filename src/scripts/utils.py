@@ -18,7 +18,7 @@ def SpriteSheet(surface, CellSize):
 
             Sheet.append(CellSurf.copy())
 
-            CellSurf.fill(0, 0, 0, 0)
+            CellSurf.fill((0, 0, 0, 0))
     
     return Sheet
 
