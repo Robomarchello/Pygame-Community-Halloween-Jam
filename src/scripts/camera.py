@@ -10,7 +10,7 @@ class Camera:
         self.surface = surface
         self.centerX = (self.surface.get_width() - self.ScreenSize[0]) // 2
 
-        self.xOffset = 302
+        self.xOffset = 0
         self.maxOffset = 300
 
         self.CamLeftRect = pygame.Rect(0, 0, 300, self.ScreenSize[1])
@@ -19,6 +19,9 @@ class Camera:
         self.moveDir = {'left': False, 'right': False}
 
         self.doorSheet = doorSheet
+
+        #means left - 0.0, center - 0.5, right = 1
+        self.normalOffset = self.xOffset / self.maxOffset + 0.5
 
     def draw(self, screen, mp, ClosedDoor):
         self.update(mp)
@@ -37,5 +40,9 @@ class Camera:
         
         if mp.x > 660 and self.xOffset < self.maxOffset:
             self.xOffset -= ((660 - mp.x) / 300) * 3 #* dt
-        
+
+        #for sound
+        #self.normalOffset = round(self.xOffset / (self.maxOffset * 2), 2)
+        #print(self.normalOffset)
+
     

@@ -8,6 +8,8 @@ class DoorToolKit:
         self.screen = screen
         self.surface = pygame.Surface((960, 540))
 
+        self.background = pygame.image.load('src/assets/DoorCloserBg.png').convert()
+
         self.ClosedDoor = ClosedDoor
 
         self.buttonImg1 = buttonImg1
@@ -56,8 +58,8 @@ class DoorToolKit:
 
     def draw(self, screen):
         if self.opened:
-            self.surface.fill((103, 103, 103))
-
+            self.surface.blit(self.background, (0, 0))
+            
             self.leftBtn.check()
             self.centerBtn.check()
             self.rightBtn.check()

@@ -10,7 +10,7 @@ class App():
     def __init__(self, ScreenSize, caption, fps):
         self.ScreenSize = ScreenSize
         
-        self.screen = pygame.display.set_mode(ScreenSize)
+        self.screen = pygame.display.set_mode(ScreenSize, SCALED)
         pygame.display.set_caption(caption)
 
         self.cursor = Cursor()
@@ -41,6 +41,14 @@ class App():
                     pygame.quit()
                     raise SystemExit
                 
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        pygame.quit()
+                        raise SystemExit
+
+                    if event.key == K_F11:
+                        pygame.display.toggle_fullscreen()
+
                 for event_handler in self.event_handlers:
                     event_handler.handle_event(event)
             

@@ -1,3 +1,4 @@
+from turtle import left
 import pygame
 from pygame.locals import *
 from src.scripts.camera import Camera
@@ -13,10 +14,13 @@ class Game():
     def __init__(self, screen, map, cursor):
         self.screen = screen
 
+        self.noiseSound = pygame.mixer.Sound('src/assets/noisesnd.ogg')
+        self.noiseSound.play(-1)
+
         self.monster = {'onLeft': False, 'inFront': False, 'onRight': False}
-        self.monsterTimer = randint(3, 7) * 60
+        self.monsterTimer = 1#randint(3, 7) * 60
         self.timerFreeze = False
-        self.jumpTimer = 4 * 60
+        self.jumpTimer = 0#4 * 60
 
         doorImg = pygame.image.load('src/assets/doorSheet.png')
         self.doorSheet = SpriteSheet(doorImg, (521, 540))
@@ -51,27 +55,37 @@ class Game():
 
     def update(self):
         self.monsterTimer -= 0.5#-= dt
+        
         if self.monsterTimer < 0 and not self.timerFreeze:
-            self.monster[choice(list(self.monster.keys()))] = True
+            #self.monster[choice(list(self.monster.keys()))] = True
+            self.monster['onRight'] = True
+            
             self.timerFreeze = True
             self.monsterTimer = randint(3, 7) * 60
 
         if self.timerFreeze:
+            self.jumpTimer -= 0.5
+
+        if self.jumpTimer < 0:
+            ...
+            #print('jumpscare')
+
+        if self.timerFreeze:
+            normalOffset = self.camera.normalOffset
             if self.stepChannel == None:
                 if self.monster['onLeft']:
-                    self.stepChannel = self.stepSound.play()
+                    self.stepChannel = self.stepSound.play(-1)
                     self.stepChannel.set_volume(1, 0)
 
                 if self.monster['inFront']:
-                    self.stepSound.set_volume(5)
                     self.stepSound.play()
-                    self.stepChannel = 1#self.stepSound.play()
-                    
+                    self.stepChannel = 1
 
-                elif self.monster['onRight']:
-                    self.stepChannel = self.stepSound.play()
+                if self.monster['onRight']:
+                    self.stepChannel = self.stepSound.play(-1)
                     self.stepChannel.set_volume(0, 1)
-        
+
+   
         self.HoverBtn.check()
         self.HoverBtn.draw(self.screen)
     
