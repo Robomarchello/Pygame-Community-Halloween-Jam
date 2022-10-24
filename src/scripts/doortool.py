@@ -27,6 +27,9 @@ class DoorToolKit:
         self.screen = screen
 
         self.opened = False
+
+        self.music = pygame.mixer.Sound('src/sounds/MusicBadDynomite.ogg')
+        self.music.play(-1)
     
     #
     def left(self):
@@ -69,6 +72,10 @@ class DoorToolKit:
             self.rightBtn.draw(self.surface)
 
             screen.blit(self.surface, (0, 0))
+
+            self.music.set_volume(1)
+        else:
+            self.music.set_volume(0)
 
     def handle_event(self, event):
         self.leftBtn.handle_event(event)
