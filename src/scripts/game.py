@@ -1,6 +1,5 @@
-from turtle import left
 import pygame
-from pygame.locals import *
+from pygame.locals import *from src.scripts.musicHandler import MusicHandler
 from src.scripts.camera import Camera
 from src.scripts.doortool import DoorToolKit
 from src.scripts.utils import SpriteSheet
@@ -17,16 +16,22 @@ class Game():
 
         self.cursor = cursor
 
+        self.musicHandler = MusicHandler()
+
         self.noiseSound = pygame.mixer.Sound('src/sounds/noisesnd.ogg')
         self.noiseSound.play(-1)
+
+        doorImg = pygame.image.load('src/assets/doorSheet.png').convert_alpha()
+        self.doorSheet = SpriteSheet(doorImg, (521, 540))
+        
+        btnImg = pygame.image.load('src/assets/button.png').convert_alpha()
+        HoverBtnImg = pygame.image.load('src/assets/bottomBtn.png').convert_alpha()
+        RadioBtnImg = pygame.image.load('src/assets/radioButton.png').convert_alpha()
 
         self.monster = {'onLeft': False, 'inFront': False, 'onRight': False}
         self.monsterTimer = 1#randint(3, 7) * 60
         self.timerFreeze = False
         self.jumpTimer = 0#4 * 60
-
-        doorImg = pygame.image.load('src/assets/doorSheet.png').convert_alpha()
-        self.doorSheet = SpriteSheet(doorImg, (521, 540))
 
         self.stepSound = pygame.mixer.Sound('src/sounds/steps.ogg')
         self.stepChannel = None
@@ -35,20 +40,16 @@ class Game():
         self.ClosedDoor = {'left': False, 'center': False, 'right': False}
 
         self.camera = Camera(screen, map, self.doorSheet)
-
-        btnImg = pygame.image.load('src/assets/button.png').convert_alpha()
+        self.Radio = Radio(self.cursor, self.musicHandler)
+        
         self.doorMenu = DoorToolKit(btnImg, btnImg, screen,
-        self.cursor, self.ClosedDoor)
-
-        self.Radio = Radio(self.cursor)
-
-        HoverBtnImg = pygame.image.load('src/assets/bottomBtn.png').convert_alpha()
+        self.cursor, self.ClosedDoor, self.musicHandler)
+        
         self.HoverBtn = HoverButton(self.cursor, (148, 470), HoverBtnImg, 
         HoverBtnImg, self.DoorMenuOpen, (583, 80))
         
-        RadioBtnImg = pygame.image.load('src/assets/radioButton.png').convert_alpha()
         self.RadioBtn = HoverButton(self.cursor, (755, 470), RadioBtnImg, 
-        RadioBtnImg, self.RadioOpen, (82, 80))
+        RadioBtnImg, self.RadioOpen, (95, 80))
 
     def DoorMenuOpen(self):
         if self.doorMenu.opened:
@@ -75,6 +76,7 @@ class Game():
         self.RadioBtn.draw(screen)
 
     def update(self):
+        self.musicHandler.inMenu = self.doorMenu.opened
         self.monsterTimer -= 0.5#-= dt
         
         if self.monsterTimer < 0 and not self.timerFreeze:
@@ -95,15 +97,15 @@ class Game():
             normalOffset = self.camera.normalOffset
             if self.stepChannel == None:
                 if self.monster['onLeft']:
-                    self.stepChannel = self.stepSound.play()
+                    self.stepChannel = self.stepSound.play(-1)
                     self.stepVolume = (1, 0)
 
                 if self.monster['inFront']:
-                    self.stepSound.play()
+                    self.stepSound.play(-1)
                     self.stepVolume = (1, 1)
 
                 if self.monster['onRight']:
-                    self.stepChannel = self.stepSound.play()
+                    self.stepChannel = self.stepSound.play(-1)
                     self.stepVolume = (0, 1)
 
             else:
@@ -111,11 +113,15 @@ class Game():
                 
                 if self.doorMenu.opened:
                     self.stepChannel.set_volume(0)
+                
+                if self.Radio.volume > 0.9:
+                    self.stepChannel.set_volume(0)
 
-        self.Radio.update(0)
+        self.Radio.update(0.20)
 
         self.HoverBtn.check()
         self.RadioBtn.check()
+        self.musicHandler.check()
     
     def handle_event(self, event):
         self.doorMenu.handle_event(event)
