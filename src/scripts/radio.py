@@ -5,19 +5,17 @@ from .ui import ImgButton
 
 
 class Radio:
-    def __init__(self, cursor):
+    def __init__(self, cursor, musicHandler):
         self.volumeTime = 0
         self.maxTime = 500
 
+        self.volume = self.volumeTime / self.maxTime
+
         self.cursor = cursor
 
-        self.font = pygame.font.Font('src/assets/radioFont.ttf', 64)
+        self.musicHandler = musicHandler
 
-        self.music = [
-            pygame.mixer.Sound('src/sounds/MusicBadDynomite.ogg')
-        ]
-        self.CurrentMusic = choice(self.music)
-        self.MusicChannel = self.CurrentMusic.play()
+        self.font = pygame.font.Font('src/assets/radioFont.ttf', 64)
 
         self.radioImg = pygame.image.load('src/assets/radio.png').convert()
 
@@ -30,7 +28,7 @@ class Radio:
         self.VolUpBtn  = ImgButton(self.cursor, (675, 230), self.VolUpImg,
         self.VolUpImg, self.subVol)
 
-        self.opened = True
+        self.opened = False
 
     def addVol(self):
         self.volumeTime += self.maxTime * 0.1
@@ -47,7 +45,7 @@ class Radio:
         if self.opened:
             screen.blit(self.radioImg, (0, 0))
 
-            VolPercent = round(self.volumeTime / self.maxTime, 2) * 100
+            VolPercent = int(self.volume * 100)
             render = self.font.render(f'Volume: {VolPercent}', False, (255, 255, 255))
 
             screen.blit(render, (205, 260))
@@ -56,15 +54,18 @@ class Radio:
             self.VolDownBtn.draw(screen)
     
     def update(self, dt):
+        self.volume = self.volumeTime / self.maxTime
+
         if self.volumeTime < self.maxTime:
             self.volumeTime += dt
         else:
             self.volumeTime = self.maxTime
 
-        self.MusicChannel.set_volume(self.volumeTime / self.maxTime)
+        self.musicHandler.set_volume(self.volume)
 
-        self.VolUpBtn.check()
-        self.VolDownBtn.check()
+        if self.opened:
+            self.VolUpBtn.check()
+            self.VolDownBtn.check()
 
     def handle_event(self, event):
         self.VolUpBtn.handle_event(event)

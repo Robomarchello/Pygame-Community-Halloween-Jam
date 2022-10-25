@@ -1,5 +1,6 @@
 import pygame
-from pygame.locals import *from src.scripts.musicHandler import MusicHandler
+from pygame.locals import *
+from src.scripts.musicHandler import MusicHandler
 from src.scripts.camera import Camera
 from src.scripts.doortool import DoorToolKit
 from src.scripts.utils import SpriteSheet

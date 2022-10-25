@@ -4,7 +4,7 @@ from .ui import ImgButton, HoverButton
 
 
 class DoorToolKit:
-    def __init__(self, screen, buttonImg1, buttonImg2, cursor, ClosedDoor):
+    def __init__(self, screen, buttonImg1, buttonImg2, cursor, ClosedDoor, musicHandler):
         self.screen = screen
         self.surface = pygame.Surface((960, 540))
 
@@ -27,11 +27,9 @@ class DoorToolKit:
         self.screen = screen
 
         self.opened = False
+        
+        self.musicHandler = musicHandler
 
-        self.music = pygame.mixer.Sound('src/sounds/MusicBadDynomite.ogg')
-        self.music.play(-1)
-    
-    #
     def left(self):
         if self.ClosedDoor['left']:
             self.ClosedDoor['left'] = False
@@ -73,9 +71,7 @@ class DoorToolKit:
 
             screen.blit(self.surface, (0, 0))
 
-            self.music.set_volume(1)
-        else:
-            self.music.set_volume(0)
+            self.musicHandler.set_volume(1)
 
     def handle_event(self, event):
         self.leftBtn.handle_event(event)
