@@ -14,7 +14,6 @@ class MusicHandler:
         self.inMenu = False
 
     def check(self):
-        print(self.CurrentMusic.get_num_channels())
         if self.CurrentMusic.get_num_channels() == 0:
             self.CurrentMusic = choice(self.music)
 

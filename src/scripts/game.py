@@ -17,6 +17,8 @@ class Game():
 
         self.cursor = cursor
 
+        self.GameOver = False
+
         self.musicHandler = MusicHandler()
 
         self.noiseSound = pygame.mixer.Sound('src/sounds/noisesnd.ogg')
@@ -29,10 +31,12 @@ class Game():
         HoverBtnImg = pygame.image.load('src/assets/bottomBtn.png').convert_alpha()
         RadioBtnImg = pygame.image.load('src/assets/radioButton.png').convert_alpha()
 
-        self.monster = {'onLeft': False, 'inFront': False, 'onRight': False}
+        self.jumpScareDummy = pygame.image.load('src/assets/scare.png').convert()
+
+        self.monster = {'onLeft': False, 'onCenter': False, 'onRight': False}
         self.monsterTimer = 1#randint(3, 7) * 60
         self.timerFreeze = False
-        self.jumpTimer = 0#4 * 60
+        self.jumpTimer = 7.5 * 60
 
         self.stepSound = pygame.mixer.Sound('src/sounds/steps.ogg')
         self.stepChannel = None
@@ -76,13 +80,24 @@ class Game():
         self.HoverBtn.draw(screen)
         self.RadioBtn.draw(screen)
 
+    def restartMonster(self):
+        self.monster = {'onLeft': False, 'onCenter': False, 'onRight': False}
+        self.monster[choice(list(self.monster.keys()))] = True
+
+        self.monsterTimer = randint(3, 7) * 60
+        self.timerFreeze = False
+        self.jumpTimer = 7.5 * 60
+
+        print('success')
+
     def update(self):
         self.musicHandler.inMenu = self.doorMenu.opened
         self.monsterTimer -= 0.5#-= dt
         
         if self.monsterTimer < 0 and not self.timerFreeze:
-            #self.monster[choice(list(self.monster.keys()))] = True
-            self.monster['onRight'] = True
+            self.monster[choice(list(self.monster.keys()))] = True
+            print(self.monster)
+            #self.monster['onRight'] = True
             
             self.timerFreeze = True
             self.monsterTimer = randint(3, 7) * 60
@@ -91,32 +106,48 @@ class Game():
             self.jumpTimer -= 0.5
 
         if self.jumpTimer < 0:
-            ...
-            #print('jumpscare')
+            if self.monster['onLeft']:
+                print('left')
+                if not self.ClosedDoor['left']:
+                    self.GameOver = True
+                    self.screen.blit(self.jumpScareDummy, (0, 0))
+
+            if self.monster['onCenter']:
+                print('center')
+                if not self.ClosedDoor['center']:
+                    self.GameOver = True
+                    self.screen.blit(self.jumpScareDummy, (0, 0))
+                    
+            if self.monster['onRight']:
+                if not self.ClosedDoor['right']:
+                    self.screen.blit(self.jumpScareDummy, (0, 0))
+                    self.GameOver = True
 
         if self.timerFreeze:
-            normalOffset = self.camera.normalOffset
             if self.stepChannel == None:
                 if self.monster['onLeft']:
-                    self.stepChannel = self.stepSound.play(-1)
+                    self.stepChannel = self.stepSound.play()
                     self.stepVolume = (1, 0)
 
-                if self.monster['inFront']:
-                    self.stepSound.play(-1)
+                if self.monster['onCenter']:
+                    self.stepChannel = self.stepSound.play()
                     self.stepVolume = (1, 1)
 
                 if self.monster['onRight']:
-                    self.stepChannel = self.stepSound.play(-1)
+                    self.stepChannel = self.stepSound.play()
                     self.stepVolume = (0, 1)
 
             else:
                 self.stepChannel.set_volume(self.stepVolume[0], self.stepVolume[1])
+                
                 
                 if self.doorMenu.opened:
                     self.stepChannel.set_volume(0)
                 
                 if self.Radio.volume > 0.9:
                     self.stepChannel.set_volume(0)
+                
+                    #self.stepChannel.set_volume(1 - self.Radio.volume)
 
         self.Radio.update(0.20)
 
