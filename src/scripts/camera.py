@@ -23,8 +23,8 @@ class Camera:
         #means left - 0.0, center - 0.5, right = 1
         self.normalOffset = self.xOffset / self.maxOffset + 0.5
 
-    def draw(self, screen, mp, ClosedDoor):
-        self.update(mp)
+    def draw(self, screen, mp, ClosedDoor, dt):
+        self.update(mp, dt)
         screen.blit(self.surface, (-(self.centerX + self.xOffset), 0))
 
         if ClosedDoor['left']:
@@ -34,12 +34,12 @@ class Camera:
         if ClosedDoor['right']:
             screen.blit(self.doorSheet[2], (740 - self.xOffset, 0))
 
-    def update(self, mp):
+    def update(self, mp, dt):
         if mp.x < 300 and self.xOffset > -self.maxOffset:
-            self.xOffset -= ((300 - mp.x) / 300) * 3#* dt
+            self.xOffset -= ((300 - mp.x) / 300) * dt * 5
         
         if mp.x > 660 and self.xOffset < self.maxOffset:
-            self.xOffset -= ((660 - mp.x) / 300) * 3 #* dt
+            self.xOffset -= ((660 - mp.x) / 300) * dt * 5
 
         #for sound
         #self.normalOffset = round(self.xOffset / (self.maxOffset * 2), 2)

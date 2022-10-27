@@ -13,7 +13,7 @@ def SpriteSheet(surface, CellSize):
     CellSurf = pygame.Surface(CellSize, SRCALPHA)
     for yCell in range(yCells):
         for xCell in range(xCells):
-            SurfOffset = (-xCell * CellSize[0], -yCell // CellSize[1])
+            SurfOffset = (-xCell * CellSize[0], -yCell * CellSize[1])
             CellSurf.blit(surface, SurfOffset)
 
             Sheet.append(CellSurf.copy())

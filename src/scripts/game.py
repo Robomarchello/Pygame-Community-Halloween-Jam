@@ -1,3 +1,4 @@
+#https://fontstruct.com/fontstructions/download/1059881
 import pygame
 from pygame.locals import *
 from src.scripts.musicHandler import MusicHandler
@@ -6,19 +7,29 @@ from src.scripts.doortool import DoorToolKit
 from src.scripts.utils import SpriteSheet
 from src.scripts.ui import HoverButton
 from src.scripts.radio import Radio
+from src.scripts.Scarer import Scarer
+from src.scripts.EndTimer import Timer
+from src.scripts.dt import get_dt
 from random import choice, randint
+
 
 pygame.mixer.init()
 
 
 class Game():
-    def __init__(self, screen, map, cursor):
+    def __init__(self, screen, map, cursor, clock):
         self.screen = screen
 
         self.cursor = cursor
 
+        self.clock = clock
+
         self.GameOver = False
         self.restarted = False
+
+        self.dt = get_dt(60)
+
+        self.timer = Timer()
 
         self.musicHandler = MusicHandler()
 
@@ -35,7 +46,7 @@ class Game():
         self.jumpScareDummy = pygame.image.load('src/assets/scare.png').convert()
 
         self.monster = {'onLeft': False, 'onCenter': False, 'onRight': False}
-        self.monsterTimer = 1#randint(3, 7) * 60
+        self.monsterTimer = randint(3, 7) * 60
         self.timerFreeze = False
         self.jumpTimer = 7.5 * 60
 
@@ -57,6 +68,8 @@ class Game():
         self.RadioBtn = HoverButton(self.cursor, (755, 470), RadioBtnImg, 
         RadioBtnImg, self.RadioOpen, (95, 80))
 
+        self.Scarer = Scarer()
+
         self.restartMonster()
         self.restarted = True
 
@@ -77,15 +90,33 @@ class Game():
             self.doorMenu.opened = False
     
     def draw(self, screen, mp):
-        self.camera.draw(screen, mp, self.ClosedDoor)
+        self.dt = get_dt(self.clock.get_fps()) 
+        self.camera.draw(screen, mp, self.ClosedDoor, self.dt)
 
         self.doorMenu.draw(screen)
         self.Radio.draw(screen)
         self.HoverBtn.draw(screen)
         self.RadioBtn.draw(screen)
+        
+        #print(self.dt)
+        self.timer.draw(screen, self.dt)
 
-        if self.GameOver:
-            self.screen.blit(self.jumpScareDummy, (0, 0))
+        self.Scarer.draw(screen, self.GameOver, self.monster, self.Radio, self.dt)
+
+    def restart(self):
+        self.Radio.volume = 0.0
+        self.camera.xOffset = 0
+
+        self.doorMenu.opened = False
+        self.Radio.opened = False
+
+        self.ClosedDoor = {'left': False, 'center': False, 'right': False}
+
+        self.Scarer.restart()
+        self.restartMonster()
+        self.timer.restart()
+
+        self.GameOver = False
 
     def restartMonster(self):
         self.monster = {'onLeft': False, 'onCenter': False, 'onRight': False}
@@ -96,20 +127,19 @@ class Game():
         self.monster[choice(list(self.monster.keys()))] = True
 
         self.stepChannel = None
-        
-        print(self.monster)
 
     def update(self):
+        self.dt = get_dt(self.clock.get_fps())
         self.musicHandler.inMenu = self.doorMenu.opened
         
         if self.monsterTimer > 0:
-            self.monsterTimer -= 0.5
+            self.monsterTimer -= self.dt
         else:
             if self.stepChannel == None:
                 self.stepChannel = self.stepSound.play()
 
             restart = False
-            self.jumpTimer -= 0.5
+            self.jumpTimer -= self.dt
             if self.jumpTimer <= 0:
                 if self.monster['onLeft']:
                     if self.ClosedDoor['left']:
@@ -136,19 +166,20 @@ class Game():
                 if restart:
                     self.restartMonster()
         
+        vol = 1 - self.Radio.volume
         if self.monster['onLeft']:
-            self.stepVolume = (1, 0)
+            self.stepVolume = (vol, 0)
 
         elif self.monster['onCenter']:
-            self.stepVolume = (1, 1)
+            self.stepVolume = (vol, vol)
 
         elif self.monster['onRight']:
-            self.stepVolume = (0, 1)
+            self.stepVolume = (0, vol)
 
         if self.stepChannel != None:
             self.stepChannel.set_volume(self.stepVolume[0], self.stepVolume[1])
 
-        self.Radio.update(0.20)
+        self.Radio.update(self.dt)
 
         self.HoverBtn.check()
         self.RadioBtn.check()
@@ -158,66 +189,7 @@ class Game():
         self.doorMenu.handle_event(event)
         self.Radio.handle_event(event)
 
-'''
-        if self.monsterTimer <= 0 and not self.timerFreeze:
-            self.monster[choice(list(self.monster.keys()))] = True
-            
-            self.timerFreeze = True
-            self.monsterTimer = randint(3, 7) * 60
-
-        if self.timerFreeze:
-            self.jumpTimer -= 0.5
-
-        if self.jumpTimer < 0:
-            if self.monster['onLeft']:
-                if not self.ClosedDoor['left']:
-                    self.GameOver = True
-                    self.screen.blit(self.jumpScareDummy, (0, 0))
-                    print('left:(')
-                else:
-                    print('left')
-                    self.restartMonster()
-
-            if self.monster['onCenter']:
-                if not self.ClosedDoor['center']:
-                    print('center:(')
-                    self.GameOver = True
-                    self.screen.blit(self.jumpScareDummy, (0, 0))
-                else:
-                    self.restartMonster()
-                    print('center')
-
-            if self.monster['onRight']:
-                if not self.ClosedDoor['right']:
-                    print('right:(')
-                    self.screen.blit(self.jumpScareDummy, (0, 0))
-                    self.GameOver = True
-                else:
-                    self.restartMonster()
-                    print('right')
-
-        if self.timerFreeze:
-            if self.stepChannel == None:
-                if self.monster['onLeft']:
-                    self.stepChannel = self.stepSound.play()
-                    self.stepVolume = (1, 0)
-
-                if self.monster['onCenter']:
-                    self.stepChannel = self.stepSound.play()
-                    self.stepVolume = (1, 1)
-
-                if self.monster['onRight']:
-                    self.stepChannel = self.stepSound.play()
-                    self.stepVolume = (0, 1)
-
-            else:
-                self.stepChannel.set_volume(self.stepVolume[0], self.stepVolume[1])
-                
-                
-                if self.doorMenu.opened:
-                    self.stepChannel.set_volume(0)
-                
-                if self.Radio.volume > 0.9:
-                    self.stepChannel.set_volume(0)
-                
-                    #self.stepChannel.set_volume(1 - self.Radio.volume)'''
+        if event.type == KEYDOWN:
+            if event.key == K_r:
+                if self.GameOver:
+                    self.restart()

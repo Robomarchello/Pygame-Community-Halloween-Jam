@@ -13,15 +13,15 @@ class App():
         self.screen = pygame.display.set_mode(ScreenSize, SCALED)
         pygame.display.set_caption(caption)
 
+        self.clock = pygame.time.Clock()
+        self.fps = fps
+
         self.cursor = Cursor()
 
         wide = pygame.image.load('src/assets/wide1.png').convert()
-        self.game = Game(self.screen, wide, self.cursor)
+        self.game = Game(self.screen, wide, self.cursor, self.clock)
 
         self.event_handlers = [self.cursor, self.game]
-
-        self.clock = pygame.time.Clock()
-        self.fps = fps
 
     def loop(self):
         screen = self.screen
@@ -51,5 +51,6 @@ class App():
 
                 for event_handler in self.event_handlers:
                     event_handler.handle_event(event)
+            
             
             pygame.display.update()

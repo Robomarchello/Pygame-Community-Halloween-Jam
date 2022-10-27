@@ -57,7 +57,7 @@ class Radio:
         self.volume = self.volumeTime / self.maxTime
 
         if self.volumeTime < self.maxTime:
-            self.volumeTime += dt
+            self.volumeTime += dt * 0.4
         else:
             self.volumeTime = self.maxTime
 
