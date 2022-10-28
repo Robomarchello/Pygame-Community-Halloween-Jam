@@ -1,18 +1,8 @@
 #https://fontstruct.com/fontstructions/download/1059881
 import pygame
 from pygame.locals import *
-from src.scripts.RandomSnek import RandomSnek
-from src.scripts.musicHandler import MusicHandler
-from src.scripts.camera import Camera
-from src.scripts.doortool import DoorToolKit
-from src.scripts.utils import SpriteSheet
-from src.scripts.ui import HoverButton
-from src.scripts.radio import Radio
-from src.scripts.Scarer import Scarer
-from src.scripts.EndTimer import Timer
-from src.scripts.dt import get_dt
+from src.scripts import *
 from random import choice, randint
-
 
 pygame.mixer.init()
 
@@ -78,9 +68,9 @@ class Game():
 
         self.tutorial = pygame.mixer.Sound('src/sounds/tutorial.ogg')
         self.tutorial.set_volume(0.5)
-        self.tutorial.play()
+        #self.tutorial.play()
         self.TutorialTimer = 60 * 60
-        self.Educated = False
+        self.Educated = True
 
         self.RandomSnek = RandomSnek(self.doorMenu, self.Radio, self.Scarer)
 
@@ -135,7 +125,7 @@ class Game():
         self.ClosedDoor['center'] = False
         self.ClosedDoor['right'] = False
         
-
+        self.RandomSnek.restart()
         self.Scarer.restart()
         self.restartMonster()
         self.timer.restart()
@@ -193,6 +183,9 @@ class Game():
 
                     if restart:
                         self.restartMonster()
+
+        else:
+            self.doorMenu.musicHandler.set_volume(0)
         
         vol = 1 - self.Radio.volume
         if self.monster['onLeft']:
@@ -207,6 +200,9 @@ class Game():
         if self.stepChannel != None:
             self.stepChannel.set_volume(self.stepVolume[0], self.stepVolume[1])
         
+        if self.doorMenu.opened:
+            self.stepChannel.set_volume(0)
+
         if not self.Educated:
             self.Radio.volumeTime = 0
 

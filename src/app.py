@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.scripts.game import Game
+from src.game import Game
 from src.scripts.cursor import Cursor
 import asyncio
 from sys import platform
@@ -14,6 +14,7 @@ class App():
         
         if platform == 'emscripten':
             self.screen = pygame.display.set_mode(ScreenSize)
+            pygame.display.set_caption('One Night At Pygame\'s')
         else:
             self.screen = pygame.display.set_mode(ScreenSize, SCALED)
             pygame.display.set_caption(caption)
@@ -59,4 +60,5 @@ class App():
                     event_handler.handle_event(event)
             
             
-            pygame.display.update()
+            pygame.display.update()  
+            await asyncio.sleep(0)

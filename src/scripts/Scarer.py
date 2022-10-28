@@ -49,6 +49,7 @@ class Scarer:
     def restart(self):
         self.start = False
         self.frame = 0
+        self.isSecond = False
         
     def draw(self, screen, GameOver, monster, radio, dt):
         if GameOver:

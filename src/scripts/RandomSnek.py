@@ -20,7 +20,7 @@ class RandomSnek:
 
     def restart(self):
         self.appear = False
-        self.ScareTimer = False
+        self.ScareTimer = 0
         self.Played = False
         self.opened = False
 
