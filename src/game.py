@@ -197,11 +197,11 @@ class Game():
         elif self.monster['onRight']:
             self.stepVolume = (0, vol)
 
+        if self.doorMenu.opened:
+            self.stepVolume = (0, 0)
+
         if self.stepChannel != None:
             self.stepChannel.set_volume(self.stepVolume[0], self.stepVolume[1])
-        
-        if self.doorMenu.opened:
-            self.stepChannel.set_volume(0)
 
         if not self.Educated:
             self.Radio.volumeTime = 0
