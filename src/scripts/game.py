@@ -1,6 +1,7 @@
 #https://fontstruct.com/fontstructions/download/1059881
 import pygame
 from pygame.locals import *
+from src.scripts.RandomSnek import RandomSnek
 from src.scripts.musicHandler import MusicHandler
 from src.scripts.camera import Camera
 from src.scripts.doortool import DoorToolKit
@@ -81,6 +82,8 @@ class Game():
         self.TutorialTimer = 60 * 60
         self.Educated = False
 
+        self.RandomSnek = RandomSnek(self.doorMenu, self.Radio, self.Scarer)
+
     def DoorMenuOpen(self):
         if self.doorMenu.opened:
             self.Radio.opened = False
@@ -101,6 +104,10 @@ class Game():
         self.dt = get_dt(self.clock.get_fps()) 
         self.camera.draw(screen, mp, self.ClosedDoor, self.dt)
 
+        GameOver = self.RandomSnek.draw(self.screen, self.Educated, self.dt)
+        if GameOver:
+            self.GameOver = True
+
         self.doorMenu.draw(screen)
         self.Radio.draw(screen)
         self.HoverBtn.draw(screen)
@@ -110,6 +117,7 @@ class Game():
         if self.Educated:
             self.timer.draw(screen, self.dt)
 
+        
         self.Scarer.draw(screen, self.GameOver, self.monster, self.Radio, self.dt)
 
         if self.timer.won:
@@ -122,7 +130,11 @@ class Game():
         self.doorMenu.opened = False
         self.Radio.opened = False
 
-        self.ClosedDoor = {'left': False, 'center': False, 'right': False}
+        #self.ClosedDoor = {'left': False, 'center': False, 'right': False}
+        self.ClosedDoor['left'] = False
+        self.ClosedDoor['center'] = False
+        self.ClosedDoor['right'] = False
+        
 
         self.Scarer.restart()
         self.restartMonster()
@@ -148,6 +160,7 @@ class Game():
             self.TutorialTimer -= self.dt
         else:
             self.Educated = True
+
         
         if self.Educated:
             if self.monsterTimer > 0:

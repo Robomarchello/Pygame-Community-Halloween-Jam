@@ -32,4 +32,5 @@ class Timer:
 
     def restart(self):
         self.time = 0 
+        self.timerUpdate = 0
         self.timeStr = '12 AM'

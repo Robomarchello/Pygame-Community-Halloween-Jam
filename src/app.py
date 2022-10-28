@@ -23,7 +23,7 @@ class App():
 
         self.cursor = Cursor()
 
-        wide = pygame.image.load('src/assets/wide1.png').convert()
+        wide = pygame.image.load('src/assets/wide.png').convert()
         self.game = Game(self.screen, wide, self.cursor, self.clock)
 
         self.event_handlers = [self.cursor, self.game]

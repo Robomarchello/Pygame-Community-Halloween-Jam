@@ -10,14 +10,19 @@ class Scarer:
         self.sheets = [
             SpriteSheet(
                 pygame.image.load('src/assets/JumpScare1.png').convert_alpha(),
-                (960, 540))
-        ]
+                (960, 540)),
+            SpriteSheet(
+                pygame.image.load('src/assets/JumpScare2.png').convert_alpha(),
+                (960, 540))]
+
         self.sound = [
             pygame.mixer.Sound('src/sounds/scream.ogg')
         ]
 
+        self.isSecond = False
+
         self.start = False
-        self.ChoosenSheet = choice(self.sheets)
+        self.ChoosenSheet = self.sheets[0]
         self.frame = 0
         self.animFrames = len(self.ChoosenSheet) - 3
         self.speed = 0.75
@@ -30,6 +35,8 @@ class Scarer:
         False, (0, 0 ,0))
         self.OverFloor = self.font.render("all over the floor",
         False, (0, 0 ,0))
+        self.WhenYouSee = self.font.render('Look into door menu when he comes!',
+        False, (0, 0, 0))
         self.rRestart = self.font.render("Press R to restart",
         False, (0, 0 ,0))
 
@@ -37,6 +44,7 @@ class Scarer:
         self.AllOverRect = self.AllOver.get_rect(center=(480, 100))
         self.OverFloorRect = self.OverFloor.get_rect(center=(480, 150))
         self.rRestartRect = self.rRestart.get_rect(center=(480, 500))
+        self.WhenYouSeeRect = self.WhenYouSee.get_rect(center=(480, 270))
     
     def restart(self):
         self.start = False
@@ -62,6 +70,11 @@ class Scarer:
 
             self.start = True
 
+            if not self.isSecond:
+                self.ChoosenSheet = self.sheets[0]
+            else:
+                self.ChoosenSheet = self.sheets[1]
+
             if self.frame < self.animFrames:
                 self.frame += dt * self.speed
                 screen.blit(self.ChoosenSheet[int(self.frame)], (0, 0))
@@ -71,7 +84,12 @@ class Scarer:
                 screen.blit(self.heAteYou, self.heAteRect.topleft)
                 screen.blit(self.AllOver, self.AllOverRect.topleft)
                 screen.blit(self.OverFloor, self.OverFloorRect.topleft)
-                screen.blit(self.ItWasOn, self.ItWasOnRect.topleft)
+
+                if not self.isSecond:
+                    screen.blit(self.ItWasOn, self.ItWasOnRect.topleft)
+                else:
+                    screen.blit(self.WhenYouSee, self.ItWasOnRect.topleft)
+
                 screen.blit(self.rRestart, self.rRestartRect.topleft)
 
         else:
