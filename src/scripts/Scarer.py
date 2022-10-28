@@ -37,7 +37,7 @@ class Scarer:
         False, (0, 0 ,0))
         self.WhenYouSee = self.font.render('Look into door menu when he comes!',
         False, (0, 0, 0))
-        self.rRestart = self.font.render("Press R to restart",
+        self.rRestart = self.font.render("Press R or click to restart",
         False, (0, 0 ,0))
 
         self.heAteRect = self.heAteYou.get_rect(center=(480, 50))

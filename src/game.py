@@ -67,9 +67,9 @@ class Game():
         self.winScreen = pygame.image.load('src/assets/winningScreen.png').convert()
 
         self.tutorial = pygame.mixer.Sound('src/sounds/tutorial.ogg')
-        self.tutorial.set_volume(0.5)
-        #self.tutorial.play()
-        self.TutorialTimer = 60 * 60
+        self.tutorial.set_volume(0.0)
+        self.tutor = self.tutorial.play()
+        #self.TutorialTimer = 60 * 60
         self.Educated = True
 
         self.RandomSnek = RandomSnek(self.doorMenu, self.Radio, self.Scarer)
@@ -146,9 +146,7 @@ class Game():
         self.dt = get_dt(self.clock.get_fps())
         self.musicHandler.inMenu = self.doorMenu.opened
         
-        if self.TutorialTimer > 0:
-            self.TutorialTimer -= self.dt
-        else:
+        if not self.tutor.get_busy():
             self.Educated = True
 
         
@@ -218,5 +216,10 @@ class Game():
 
         if event.type == KEYDOWN:
             if event.key == K_r:
+                if self.GameOver:
+                    self.restart()
+        
+        if event.type == MOUSEBUTTONDOWN:
+            if event.button == 1:
                 if self.GameOver:
                     self.restart()
