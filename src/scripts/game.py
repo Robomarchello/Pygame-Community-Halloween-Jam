@@ -73,6 +73,14 @@ class Game():
         self.restartMonster()
         self.restarted = True
 
+        self.winScreen = pygame.image.load('src/assets/winningScreen.png').convert()
+
+        self.tutorial = pygame.mixer.Sound('src/sounds/tutorial.ogg')
+        self.tutorial.set_volume(0.5)
+        self.tutorial.play()
+        self.TutorialTimer = 60 * 60
+        self.Educated = False
+
     def DoorMenuOpen(self):
         if self.doorMenu.opened:
             self.Radio.opened = False
@@ -99,9 +107,13 @@ class Game():
         self.RadioBtn.draw(screen)
         
         #print(self.dt)
-        self.timer.draw(screen, self.dt)
+        if self.Educated:
+            self.timer.draw(screen, self.dt)
 
         self.Scarer.draw(screen, self.GameOver, self.monster, self.Radio, self.dt)
+
+        if self.timer.won:
+            screen.blit(self.winScreen, (0, 0))
 
     def restart(self):
         self.Radio.volume = 0.0
@@ -132,39 +144,42 @@ class Game():
         self.dt = get_dt(self.clock.get_fps())
         self.musicHandler.inMenu = self.doorMenu.opened
         
-        if self.monsterTimer > 0:
-            self.monsterTimer -= self.dt
+        if self.TutorialTimer > 0:
+            self.TutorialTimer -= self.dt
         else:
-            if self.stepChannel == None:
-                self.stepChannel = self.stepSound.play()
+            self.Educated = True
+        
+        if self.Educated:
+            if self.monsterTimer > 0:
+                self.monsterTimer -= self.dt
+            else:
+                if self.stepChannel == None:
+                    self.stepChannel = self.stepSound.play()
 
-            restart = False
-            self.jumpTimer -= self.dt
-            if self.jumpTimer <= 0:
-                if self.monster['onLeft']:
-                    if self.ClosedDoor['left']:
-                        restart = True
-                        print('job')
-                    else:
-                        self.GameOver = True
-            
-                if self.monster['onCenter']:
-                    if self.ClosedDoor['center']:
-                        restart = True
-                        print('job')
-                    else:
-                        self.GameOver = True
-            
-                if self.monster['onRight']:
-                    if self.ClosedDoor['right']:
+                restart = False
+                self.jumpTimer -= self.dt
+                if self.jumpTimer <= 0:
+                    if self.monster['onLeft']:
+                        if self.ClosedDoor['left']:
+                            restart = True
+                        else:
+                            self.GameOver = True
+                
+                    if self.monster['onCenter']:
+                        if self.ClosedDoor['center']:
+                            restart = True
+                        else:
+                            self.GameOver = True
+                
+                    if self.monster['onRight']:
+                        if self.ClosedDoor['right']:
+                            self.restartMonster()
+                            restart = True
+                        else:
+                            self.GameOver = True     
+
+                    if restart:
                         self.restartMonster()
-                        restart = True
-                        print('job')
-                    else:
-                        self.GameOver = True     
-
-                if restart:
-                    self.restartMonster()
         
         vol = 1 - self.Radio.volume
         if self.monster['onLeft']:
@@ -178,6 +193,9 @@ class Game():
 
         if self.stepChannel != None:
             self.stepChannel.set_volume(self.stepVolume[0], self.stepVolume[1])
+        
+        if not self.Educated:
+            self.Radio.volumeTime = 0
 
         self.Radio.update(self.dt)
 

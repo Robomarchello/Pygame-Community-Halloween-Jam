@@ -1,5 +1,4 @@
 #I know this is an awesome name for python script
-from tkinter.messagebox import NO
 import pygame
 from pygame.locals import *
 from random import choice
@@ -21,7 +20,7 @@ class Scarer:
         self.ChoosenSheet = choice(self.sheets)
         self.frame = 0
         self.animFrames = len(self.ChoosenSheet) - 3
-        self.speed = 1.25#0.15
+        self.speed = 0.75
 
         self.font = pygame.font.Font('src/assets/pixel.ttf', 30)
 

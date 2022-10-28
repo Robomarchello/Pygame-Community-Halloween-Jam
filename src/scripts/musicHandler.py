@@ -9,7 +9,7 @@ class MusicHandler:
             pygame.mixer.Sound('src/sounds/MusicBadDynomite1.ogg')
         ]
         self.CurrentMusic = choice(self.music)
-        self.MusicChannel = self.CurrentMusic.play()
+        self.MusicChannel = self.CurrentMusic.play(-1)
 
         self.inMenu = False
 

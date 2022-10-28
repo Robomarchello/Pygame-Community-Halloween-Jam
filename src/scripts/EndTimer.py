@@ -11,6 +11,8 @@ class Timer:
 
         self.time = 0
         self.timeStr = '12 AM'
+
+        self.won = False
     
     def draw(self, screen, dt):
         self.timerUpdate += dt
@@ -23,7 +25,7 @@ class Timer:
             self.timeStr = f'{self.time} AM'
             
         if self.time >= 6:
-            print('you won')
+            self.won = True
 
         self.timeRender = self.font.render(self.timeStr, False, (200, 200, 200))
         screen.blit(self.timeRender, (15, 15))
