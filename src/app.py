@@ -2,6 +2,8 @@ import pygame
 from pygame.locals import *
 from src.scripts.game import Game
 from src.scripts.cursor import Cursor
+import asyncio
+from sys import platform
 
 pygame.init()
 
@@ -10,8 +12,11 @@ class App():
     def __init__(self, ScreenSize, caption, fps):
         self.ScreenSize = ScreenSize
         
-        self.screen = pygame.display.set_mode(ScreenSize, SCALED)
-        pygame.display.set_caption(caption)
+        if platform == 'emscripten':
+            self.screen = pygame.display.set_mode(ScreenSize)
+        else:
+            self.screen = pygame.display.set_mode(ScreenSize, SCALED)
+            pygame.display.set_caption(caption)
 
         self.clock = pygame.time.Clock()
         self.fps = fps
@@ -23,7 +28,7 @@ class App():
 
         self.event_handlers = [self.cursor, self.game]
 
-    def loop(self):
+    async def loop(self):
         screen = self.screen
         while True:
             self.clock.tick(self.fps)
@@ -47,7 +52,8 @@ class App():
                         raise SystemExit
 
                     if event.key == K_F11:
-                        pygame.display.toggle_fullscreen()
+                        if platform != 'emscripten':
+                            pygame.display.toggle_fullscreen()
 
                 for event_handler in self.event_handlers:
                     event_handler.handle_event(event)
